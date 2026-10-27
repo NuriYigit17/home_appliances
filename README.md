@@ -30,6 +30,28 @@ Ev eşyası mağazası için müşteri hesap kartı, taksit ve tahsilat uygulama
 6. `.env.example` dosyasını `.env.local` olarak kopyalayın. Supabase Project Settings > API bölümündeki URL, **publishable key** ve yalnızca sunucuda kullanılacak **secret key** değerlerini girin. Secret key'i hiçbir zaman tarayıcı koduna veya Git'e koymayın.
 7. `npm run dev` ile uygulamayı açın. `.env.local` yoksa kurulum sayfası gösterilir.
 
+## Cloudflare Workers üzerinde yayınlama
+
+Bu uygulama sunucuda oturum kontrolü, Server Actions ve API yolları kullandığı için
+Cloudflare **Workers** üzerinde `vinext` ile çalışır. Statik Pages dağıtımı uygun değildir.
+Cloudflare'a gönderilecek kaynak kod GitHub'daki `main` dalında olmalıdır.
+
+- Node sürümü `.node-version` dosyasındaki **24.22.1** olmalı.
+- Workers Builds **Build command**: `npm run build:vinext`
+- Workers Builds **Deploy command**: `npm run deploy:vinext`
+- İlk kurulumda önizleme dağıtımlarını kapalı tutun; önizlemeler aynı canlı Supabase
+  projesine bağlanır.
+- Supabase URL ve publishable key, herkese açık değerler olarak
+  `deployment/public-env.ts` dosyasında tanımlıdır. Secret key veya veritabanı
+  şifresini GitHub'a koymayın.
+- Telefon bildirimleri ayrıca kurulana kadar kapalı kalır; dashboard'daki yaklaşan
+  ödeme uyarıları çalışır. Bildirim kurulumu için aşağıdaki bölüme bakın.
+
+Yerel Worker önizlemesi için `npm run build:vinext` ve ardından
+`npm run start:vinext` çalıştırın. Ücretsiz Workers planında istek başına CPU
+sınırı vardır; canlı yayından sonra giriş, dashboard, yeni satış ve kısmi ödeme
+akışlarını gerçek adreste kontrol edin.
+
 ## Telefon bildirimleri
 
 Web Push ayrıca ücretli SMS/WhatsApp API'si gerektirmez. `npx web-push generate-vapid-keys` komutuyla VAPID anahtarları oluşturup `.env.local` içindeki `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` ve `VAPID_SUBJECT` değerlerini doldurun. `CRON_SECRET` için uzun, rastgele bir metin belirleyin.

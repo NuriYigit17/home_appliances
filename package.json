@@ -2,34 +2,53 @@
   "name": "home_appliances",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24.22.0 <25"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "tsx --test tests/*.test.ts",
-    "format": "prettier --write src tests"
+    "format": "prettier --write src tests",
+    "dev:vinext": "vite dev --port 3001",
+    "build:vinext": "vite build",
+    "start:vinext": "vite preview",
+    "deploy:vinext": "vinext-cloudflare deploy"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
+    "@vinext/cloudflare": "^1.2.1",
     "lucide-react": "^1.61.0",
     "next": "16.4.3",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-server-dom-webpack": "^19.3.1",
+    "vinext": "^1.3.1",
     "web-push": "^3.6.7",
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-beta.v.5",
     "@electric-sql/pglite": "^0.5.11",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-rsc": "^0.5.38",
+    "cf": "^1.0.0-beta.23",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",
-    "typescript": "^5"
-  }
+    "typescript": "^5",
+    "vite": "^8.3.5"
+  },
+  "overrides": {
+    "fflate": "0.7.5"
+  },
+  "type": "module"
 }
