@@ -34,7 +34,13 @@ Ev eşyası mağazası için müşteri hesap kartı, taksit ve tahsilat uygulama
 
 Bu uygulama sunucuda oturum kontrolü, Server Actions ve API yolları kullandığı için
 Cloudflare **Workers** üzerinde `vinext` ile çalışır. Statik Pages dağıtımı uygun değildir.
-Cloudflare'a gönderilecek kaynak kod GitHub'daki `main` dalında olmalıdır.
+Git bağlantısı daha sonra kurulursa kaynak dalı GitHub'daki `main` olmalıdır.
+
+İlk canlı yayın yerel terminalden `npm run deploy:vinext` ile yapıldı.
+**GitHub otomatik dağıtımı henüz bağlı değil:** `git push` tek başına canlı sürümü
+güncellemez. Sonraki dağıtımlarda Cloudflare hesabındaki sınırlı yetkili API
+anahtarı `CLOUDFLARE_API_TOKEN` ortam değişkeni olarak sağlanmalıdır; anahtar
+değeri bu depoda veya yerel `.env` dosyalarında tutulmaz.
 
 - Node sürümü `.node-version` dosyasındaki **24.22.1** olmalı.
 - Workers Builds **Build command**: `npm run build:vinext`
