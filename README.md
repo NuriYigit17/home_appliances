@@ -28,7 +28,7 @@ Ev eşyası mağazası için müşteri hesap kartı, taksit ve tahsilat uygulama
    where email = 'kullanici@example.com';
    ```
 
-6. `.env.example` dosyasını `.env.local` olarak kopyalayın. Supabase Project Settings > API bölümündeki URL, **publishable key** ve yalnızca sunucuda kullanılacak **secret key** değerlerini girin. Secret key'i hiçbir zaman tarayıcı koduna veya Git'e koymayın.
+6. `.env.example` dosyasını `.env.local` olarak kopyalayın. Supabase Project Settings > API bölümündeki URL ve **publishable key** değerlerini girin. VAPID public key yalnızca bildirim aboneliği için kullanılır; özel anahtar Supabase Vault'ta tutulur.
 7. `npm run dev` ile uygulamayı açın. `.env.local` yoksa kurulum sayfası gösterilir.
 
 ## Cloudflare Workers üzerinde yayınlama
@@ -55,8 +55,8 @@ Sınırlı yetkili anahtarı dosyaya kaydetmeden dağıtmak için `bash scripts/
 - Supabase URL ve publishable key, herkese açık değerler olarak
   `deployment/public-env.ts` dosyasında tanımlıdır. Secret key veya veritabanı
   şifresini GitHub'a koymayın.
-- Telefon bildirimleri ayrıca kurulana kadar kapalı kalır; dashboard'daki yaklaşan
-  ödeme uyarıları çalışır. Bildirim kurulumu için aşağıdaki bölüme bakın.
+- Telefon bildirimi için herkese açık VAPID anahtarı da
+  `deployment/public-env.ts` içinde bulunur.
 
 Yerel Worker önizlemesi için `npm run build:vinext` ve ardından
 `npm run start:vinext` çalıştırın. Ücretsiz Workers planında istek başına CPU
@@ -65,9 +65,17 @@ akışlarını gerçek adreste kontrol edin.
 
 ## Telefon bildirimleri
 
-Web Push ayrıca ücretli SMS/WhatsApp API'si gerektirmez. `npx web-push generate-vapid-keys` komutuyla VAPID anahtarları oluşturup `.env.local` içindeki `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` ve `VAPID_SUBJECT` değerlerini doldurun. `CRON_SECRET` için uzun, rastgele bir metin belirleyin.
+Web Push için ücretli SMS/WhatsApp API'si gerekmez. Gönderim işlevi
+`supabase/functions/daily-push-reminders` içinde çalışır. VAPID özel anahtarı ve
+günlük görev tokeni Supabase Vault'ta tutulur; Cloudflare'a gizli Supabase anahtarı
+verilmez. `20261030152706_daily_push_reminders.sql` migration'ı her gün Türkiye
+saatiyle 09.00'da işlevi çağırır.
 
-Uygulama HTTPS üzerinden yayımlandıktan sonra `supabase/reminders_cron.example.sql` dosyasındaki URL ve secret yer tutucularını değiştirip SQL Editor'da çalıştırın. Bu görev her gün Türkiye saatiyle 09.00'da `/api/cron/reminders` uç noktasını çağırır. Telefon bildirim izni vermelidir; iPhone'da web uygulaması ana ekrana eklenmelidir. Bildirim gelmese bile uyarılar dashboard'da görünür.
+Canlı Supabase projesinde işlev, Vault anahtarları ve günlük görev kurulmuştur.
+Cloudflare uygulaması yeni sürümle dağıtıldıktan sonra kullanıcı Android Chrome'da
+uygulamaya giriş yapıp **Telefon bildirimi → Aç** düğmesine basmalı ve tarayıcı iznini
+onaylamalıdır. Telefon izin vermeden bildirim gönderilemez. Bildirim gelmese bile
+yaklaşan ödeme uyarıları dashboard'da görünür.
 
 ## Kontrol
 

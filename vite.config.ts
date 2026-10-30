@@ -4,6 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import {
   supabasePublicUrl,
   supabasePublishableKey,
+  vapidPublicKey,
 } from "./deployment/public-env.ts";
 
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
     "process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
       supabasePublishableKey,
     ),
+    "process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY": JSON.stringify(vapidPublicKey),
   },
   plugins: [
     vinext(),

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { apiStaff, isSameOrigin } from "@/lib/api-auth";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 const subscriptionSchema = z.object({
   endpoint: z.url().max(2000),
@@ -28,14 +27,18 @@ export async function POST(request: NextRequest) {
       { error: "Bildirim kaydı geçersiz." },
       { status: 400 },
     );
-  const admin = createAdminClient();
-  const { error } = await admin.from("push_subscriptions").upsert(
-    {
-      user_id: auth.user.id,
-      ...parsed.data,
-    },
-    { onConflict: "endpoint" },
-  );
+  const { data: existing, error: lookupError } = await auth.supabase
+    .from("push_subscriptions")
+    .select("id")
+    .eq("endpoint", parsed.data.endpoint)
+    .maybeSingle();
+  if (lookupError)
+    return NextResponse.json({ error: "Bildirim kaydı kontrol edilemedi." }, { status: 500 });
+  if (existing) return NextResponse.json({ ok: true });
+  const { error } = await auth.supabase.from("push_subscriptions").insert({
+    user_id: auth.user.id,
+    ...parsed.data,
+  });
   if (error)
     return NextResponse.json(
       { error: "Bildirim kaydı oluşturulamadı." },
@@ -59,7 +62,7 @@ export async function DELETE(request: NextRequest) {
   const parsed = deleteSchema.safeParse(body);
   if (!parsed.success)
     return NextResponse.json({ error: "Geçersiz adres." }, { status: 400 });
-  const { error } = await createAdminClient()
+  const { error } = await auth.supabase
     .from("push_subscriptions")
     .delete()
     .eq("user_id", auth.user.id)

@@ -2,6 +2,7 @@ import { bindings, defineConfig, defineWorker } from "cf/config";
 import {
   supabasePublicUrl,
   supabasePublishableKey,
+  vapidPublicKey,
 } from "./deployment/public-env.ts";
 
 export default defineConfig({
@@ -20,6 +21,7 @@ export default defineConfig({
       ASSETS: bindings.assets(),
       NEXT_PUBLIC_SUPABASE_URL: bindings.text(supabasePublicUrl),
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: bindings.text(supabasePublishableKey),
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: bindings.text(vapidPublicKey),
     },
   }),
 });
