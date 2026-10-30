@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Printer, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Pencil,
+  Printer,
+  UserRound,
+} from "lucide-react";
 import { requireStaff } from "@/lib/auth";
 import { getSaleDetail } from "@/lib/data";
 import { formatDate, formatMoney } from "@/lib/finance";
@@ -58,9 +64,14 @@ export default async function SaleDetailPage({
             {sale.invoice_no || "—"}
           </p>
         </div>
-        <Link href={`/sales/${id}/print`} className="button secondary">
-          <Printer size={18} /> Ödeme planını yazdır
-        </Link>
+        <div className="section-actions">
+          <Link href={`/customers/${customer.id}`} className="button secondary">
+            <Pencil size={18} /> Müşteriyi düzenle
+          </Link>
+          <Link href={`/sales/${id}/print`} className="button secondary">
+            <Printer size={18} /> Ödeme planını yazdır
+          </Link>
+        </div>
       </div>
 
       <section className="stat-grid three-cards">

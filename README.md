@@ -10,13 +10,14 @@ Ev eşyası mağazası için müşteri hesap kartı, taksit ve tahsilat uygulama
 - Tahsilat grafiği, yaklaşan ve geciken ödeme listeleri
 - Müşteriye verilecek yazdırılabilir ödeme planı
 - İzin verilen cihazlara, vade 3 gün kala ve gecikmede Web Push bildirimi
-- Stok modülü için ayrı `sale_items` kayıtları; faz 2'de ürün/stok tabloları eklenebilir
+- Sol menüden müşteri listesi, müşteri bilgilerini güncelleme ve geçmiş satışları koruyarak listeden kaldırma
+- Ürün kartları, başlangıç stoku, stok giriş/çıkışı ve hareket geçmişi; katalog ürünü satıldığında otomatik stok düşümü
 
 ## Yerel kurulum
 
 1. `npm install`
 2. [Supabase](https://supabase.com/dashboard) üzerinde bir proje oluşturun.
-3. SQL Editor içinde [`supabase/migrations/20261026000000_initial.sql`](supabase/migrations/20261026000000_initial.sql) dosyasını çalıştırın. SQL, tabloları, erişim kurallarını ve atomik satış/ödeme fonksiyonlarını oluşturur.
+3. SQL Editor içinde önce [`supabase/migrations/20261026000000_initial.sql`](supabase/migrations/20261026000000_initial.sql), ardından [`supabase/migrations/20261030000000_inventory_customers.sql`](supabase/migrations/20261030000000_inventory_customers.sql) dosyasını çalıştırın. İkinci dosya mevcut projede yalnızca yeni stok tablolarını, müşteri arşivleme alanını ve ilgili fonksiyonları ekler.
 4. Supabase Auth ayarlarında herkese açık kullanıcı kaydını kapatın. Auth > Users bölümünden baba ve gerekiyorsa oğul için e-posta/şifre hesabı oluşturun.
 5. Oluşturulan hesapları `staff` tablosuna ekleyin. Her hesap için e-postayı değiştirerek SQL Editor'da çalıştırın:
 
@@ -43,6 +44,7 @@ anahtarı `CLOUDFLARE_API_TOKEN` ortam değişkeni olarak sağlanmalıdır; anah
 değeri bu depoda veya yerel `.env` dosyalarında tutulmaz.
 
 - Node sürümü `.node-version` dosyasındaki **24.22.1** olmalı.
+- Var olan canlı Supabase projesinde yeni migration uygulanmadan yeni Worker sürümünü yayımlamayın.
 - Workers Builds **Build command**: `npm run build:vinext`
 - Workers Builds **Deploy command**: `npm run deploy:vinext`
 - İlk kurulumda önizleme dağıtımlarını kapalı tutun; önizlemeler aynı canlı Supabase
@@ -74,6 +76,6 @@ npm run build
 
 ## Veri güvenliği ve yedekleme
 
-Veriler yalnızca `staff` tablosunda aktif olan oturumlara açılır. Taksit ve ödeme tablolarına doğrudan yazma izni yoktur; satış ve tahsilat veritabanı fonksiyonlarıyla tek işlem olarak kaydedilir. Peşinat ve taksit ödemeleri ayrı hareketlerdir. Geri alınan ödemeler silinmez, gerekçesiyle saklanır.
+Veriler yalnızca `staff` tablosunda aktif olan oturumlara açılır. Taksit ve ödeme tablolarına doğrudan yazma izni yoktur; satış ve tahsilat veritabanı fonksiyonlarıyla tek işlem olarak kaydedilir. Peşinat ve taksit ödemeleri ayrı hareketlerdir. Geri alınan ödemeler silinmez, gerekçesiyle saklanır. Müşteri silme işlemi kayıtları arşivler; satışlar, ödemeler ve alacaklar korunur. Stok hareketleri de silinmeyen bir geçmiş olarak tutulur.
 
 Supabase ücretsiz planda günlük otomatik yedeğe güvenmeyin. Canlı kullanım için düzenli dışa aktarım ve ayrı yerde saklama planı kurun; ücretsiz proje az kullanımda duraklayabilir. Müşteri kayıtları tutulmadan önce bu operasyonel adımı tamamlayın.

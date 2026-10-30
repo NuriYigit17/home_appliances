@@ -50,12 +50,31 @@ export type Sale = {
 export type SaleItem = {
   id: string;
   sale_id: string;
+  product_id?: string | null;
   product_name: string;
   quantity: number;
   unit_price_cents: number;
   sale_date: string;
   delivery_date: string | null;
   delivered: boolean;
+};
+export type StockProduct = {
+  id: string;
+  name: string;
+  sku: string | null;
+  unit_price_cents: number;
+  stock_quantity: number;
+  reorder_at: number;
+  active: boolean;
+  created_at: string;
+};
+export type StockMovement = {
+  id: string;
+  product_id: string;
+  quantity_delta: number;
+  kind: "opening" | "manual" | "sale";
+  note: string | null;
+  created_at: string;
 };
 export type Installment = {
   id: string;
@@ -292,5 +311,57 @@ export async function getSaleDetail(supabase: SupabaseClient, id: string) {
     installments,
     paidCents,
     remainingCents: Math.max(0, typedSale.total_cents - paidCents),
+  };
+}
+
+export async function getStockData(supabase: SupabaseClient) {
+  const [products, movementResult] = await Promise.all([
+    allRows<StockProduct>(supabase, "products"),
+    supabase
+      .from("stock_movements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+  if (movementResult.error) throw new Error(movementResult.error.message);
+  return {
+    products: products.sort((a, b) => a.name.localeCompare(b.name, "tr")),
+    movements: (movementResult.data ?? []) as StockMovement[],
+  };
+}
+
+export async function getCustomerList(supabase: SupabaseClient) {
+  const [customers, sales] = await Promise.all([
+    allRows<Customer & { deleted_at: string | null }>(supabase, "customers"),
+    allRows<Sale>(supabase, "sales"),
+  ]);
+  return customers
+    .filter((customer) => !customer.deleted_at)
+    .map((customer) => ({
+      customer,
+      sales: sales.filter((sale) => sale.customer_id === customer.id),
+    }))
+    .sort((a, b) =>
+      a.customer.full_name.localeCompare(b.customer.full_name, "tr"),
+    );
+}
+
+export async function getCustomerDetail(supabase: SupabaseClient, id: string) {
+  const { data: customer, error } = await supabase
+    .from("customers")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!customer) return null;
+  const { data: sales, error: salesError } = await supabase
+    .from("sales")
+    .select("id, total_cents, created_at, invoice_no")
+    .eq("customer_id", id)
+    .order("created_at", { ascending: false });
+  if (salesError) throw new Error(salesError.message);
+  return {
+    customer: customer as Customer & { deleted_at: string | null },
+    sales: sales ?? [],
   };
 }

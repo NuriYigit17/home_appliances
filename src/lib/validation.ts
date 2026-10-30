@@ -5,7 +5,7 @@ const optionalDate = z.union([date, z.literal("")]).default("");
 const optionalText = z.string().trim().max(500).default("");
 const cents = z.number().int().min(0).max(100_000_000_000);
 
-const customer = z.object({
+export const customerSchema = z.object({
   full_name: z.string().trim().min(2).max(160),
   address: optionalText,
   home_phone: optionalText,
@@ -34,6 +34,7 @@ const guarantor = z.object({
 });
 
 const item = z.object({
+  product_id: z.uuid().nullable().default(null),
   product_name: z.string().trim().min(1).max(200),
   quantity: z.number().int().min(1).max(10000),
   unit_price_cents: cents.min(1),
@@ -44,7 +45,7 @@ const item = z.object({
 
 export const saleSchema = z
   .object({
-    customer,
+    customer: customerSchema,
     guarantor,
     invoice_date: optionalDate,
     invoice_no: optionalText,
@@ -92,4 +93,24 @@ export const paymentSchema = z.object({
   installmentId: z.uuid(),
   amountCents: cents.min(1),
   paidOn: date,
+});
+
+export const productSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  sku: z.string().trim().max(80).default(""),
+  unit_price_cents: cents,
+  reorder_at: z.number().int().min(0).max(100000),
+  active: z.boolean().default(true),
+});
+export const newProductSchema = productSchema.extend({
+  initial_quantity: z.number().int().min(0).max(1000000),
+});
+export const stockAdjustmentSchema = z.object({
+  delta: z
+    .number()
+    .int()
+    .min(-1000000)
+    .max(1000000)
+    .refine((n) => n !== 0),
+  note: z.string().trim().min(2).max(300),
 });

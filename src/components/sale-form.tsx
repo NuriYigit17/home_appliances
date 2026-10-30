@@ -12,6 +12,7 @@ import {
   parseMoney,
   todayIstanbul,
 } from "@/lib/finance";
+import type { StockProduct } from "@/lib/data";
 
 const today = todayIstanbul();
 const emptyCustomer = {
@@ -43,6 +44,7 @@ const emptyGuarantor = {
 type CustomerKey = keyof typeof emptyCustomer;
 type GuarantorKey = keyof typeof emptyGuarantor;
 type ItemForm = {
+  product_id: string;
   product_name: string;
   quantity: string;
   price: string;
@@ -51,6 +53,7 @@ type ItemForm = {
   delivered: boolean;
 };
 const newItem = (): ItemForm => ({
+  product_id: "",
   product_name: "",
   quantity: "1",
   price: "",
@@ -68,6 +71,7 @@ function TextInput({
   placeholder,
   inputMode,
   maxLength,
+  disabled = false,
 }: {
   label: string;
   value: string;
@@ -77,6 +81,7 @@ function TextInput({
   placeholder?: string;
   inputMode?: "numeric" | "decimal" | "tel";
   maxLength?: number;
+  disabled?: boolean;
 }) {
   return (
     <label className="field">
@@ -92,12 +97,13 @@ function TextInput({
         placeholder={placeholder}
         inputMode={inputMode}
         maxLength={maxLength}
+        disabled={disabled}
       />
     </label>
   );
 }
 
-export default function SaleForm() {
+export default function SaleForm({ products }: { products: StockProduct[] }) {
   const router = useRouter();
   const [customer, setCustomer] = useState(emptyCustomer);
   const [guarantor, setGuarantor] = useState(emptyGuarantor);
@@ -150,6 +156,7 @@ export default function SaleForm() {
     event.preventDefault();
     setError("");
     const parsedItems = items.map((item) => ({
+      product_id: item.product_id || null,
       product_name: item.product_name.trim(),
       quantity: Number(item.quantity),
       unit_price_cents: parseMoney(item.price),
@@ -350,8 +357,8 @@ export default function SaleForm() {
                 <span className="step-label">04</span>
                 <h2>Satılan ürünler</h2>
                 <p>
-                  Ürünler şimdilik elle girilir. Her ürünün teslim durumu ayrı
-                  tutulur.
+                  Stoktaki ürünü seçin; satış kaydedilince adet otomatik düşer.
+                  Stokta olmayan ürünleri elle girebilirsiniz.
                 </p>
               </div>
             </div>
@@ -372,6 +379,53 @@ export default function SaleForm() {
                       </button>
                     )}
                   </div>
+                  <label className="field" style={{ marginBottom: 15 }}>
+                    <span>Stok ürünü</span>
+                    <select
+                      value={item.product_id}
+                      onChange={(event) => {
+                        const product = products.find(
+                          (row) => row.id === event.target.value,
+                        );
+                        setItems((old) =>
+                          old.map((row, i) =>
+                            i !== index
+                              ? row
+                              : {
+                                  ...row,
+                                  product_id: product?.id ?? "",
+                                  product_name: product?.name ?? "",
+                                  price: product
+                                    ? (product.unit_price_cents / 100).toFixed(
+                                        2,
+                                      )
+                                    : "",
+                                },
+                          ),
+                        );
+                      }}
+                    >
+                      <option value="">Elle girilen / stoksuz ürün</option>
+                      {products.map((product) => (
+                        <option
+                          key={product.id}
+                          value={product.id}
+                          disabled={product.stock_quantity < 1}
+                        >
+                          {product.name} · stok {product.stock_quantity}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {item.product_id &&
+                    Number(item.quantity) >
+                      (products.find(
+                        (product) => product.id === item.product_id,
+                      )?.stock_quantity ?? 0) && (
+                      <p className="form-error">
+                        Seçilen ürün için stok yetersiz.
+                      </p>
+                    )}
                   <div className="form-grid three">
                     <TextInput
                       label="Satılan ürün"
@@ -381,6 +435,7 @@ export default function SaleForm() {
                       }
                       required
                       placeholder="Örn. Çamaşır makinesi"
+                      disabled={Boolean(item.product_id)}
                     />
                     <TextInput
                       label="Adet (AD)"
