@@ -43,6 +43,9 @@ güncellemez. Sonraki dağıtımlarda Cloudflare hesabındaki sınırlı yetkili
 anahtarı `CLOUDFLARE_API_TOKEN` ortam değişkeni olarak sağlanmalıdır; anahtar
 değeri bu depoda veya yerel `.env` dosyalarında tutulmaz.
 
+Sınırlı yetkili anahtarı dosyaya kaydetmeden dağıtmak için `bash scripts/deploy-cloudflare.sh`
+çalıştırın. Komut anahtarı görünmeden ister ve yalnızca o dağıtım işlemi için kullanır.
+
 - Node sürümü `.node-version` dosyasındaki **24.22.1** olmalı.
 - Var olan canlı Supabase projesinde yeni migration uygulanmadan yeni Worker sürümünü yayımlamayın.
 - Workers Builds **Build command**: `npm run build:vinext`
