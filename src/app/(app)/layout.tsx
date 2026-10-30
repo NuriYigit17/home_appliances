@@ -30,7 +30,7 @@ export default async function AppLayout({
             Takibi
           </span>
         </Link>
-        <p className="sidebar-caption">DÜKKÂN YÖNETİMİ</p>
+        <p className="sidebar-caption">MAĞAZA YÖNETİMİ</p>
         <SidebarNav />
         <div className="sidebar-bottom">
           <span className="user-name">{staff.display_name}</span>

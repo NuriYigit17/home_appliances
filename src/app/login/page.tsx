@@ -22,7 +22,7 @@ export default async function LoginPage({
         <div className="auth-mark">
           <ReceiptText size={30} />
         </div>
-        <span className="eyebrow">DÜKKÂN YÖNETİMİ</span>
+        <span className="eyebrow">MAĞAZA YÖNETİMİ</span>
         <h1>Müşteri Hesap Takibi</h1>
         <p className="muted">
           Satışları, taksitleri ve tahsilatları güvenle takip edin.

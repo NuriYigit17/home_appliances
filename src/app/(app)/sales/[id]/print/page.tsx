@@ -117,7 +117,7 @@ export default async function PrintPage({
           </tbody>
         </table>
         <p className="print-note">
-          Bu belge satışa ait ödeme planını gösterir. Ödeme alındıkça dükkân
+          Bu belge satışa ait ödeme planını gösterir. Ödeme alındıkça mağaza
           kayıtlarına işlenir.
         </p>
         <div className="signature-row">

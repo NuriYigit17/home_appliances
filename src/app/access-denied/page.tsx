@@ -10,7 +10,7 @@ export default function AccessDeniedPage() {
         </div>
         <h1>Hesabınız yetkilendirilmemiş</h1>
         <p className="muted">
-          Bu hesap giriş yapabiliyor fakat dükkân kayıtlarına erişim izni yok.
+          Bu hesap giriş yapabiliyor fakat mağaza kayıtlarına erişim izni yok.
           Yönetici sizi staff listesine eklemeli.
         </p>
         <form action={signOut}>

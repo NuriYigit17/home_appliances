@@ -70,7 +70,7 @@ export default function CustomerList({
                       href={`/customers/${customer.id}`}
                       className="button secondary small"
                     >
-                      Aç / düzenle
+                      Düzenle
                     </Link>
                   </td>
                 </tr>
